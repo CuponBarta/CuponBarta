@@ -10,7 +10,7 @@ eleventyExcludeFromCollections: true
   <link>{{ site.baseUrl }}</link>
   <description>Latest verified deals and coupons for Bangladesh (bKash/Nagad friendly).</description>
   <language>bn-BD</language>
-  {% for d in collections.activeDeals | limit(30) %}
+  {% for d in active_deals | limit(30) %}
   <item>
     <title>{{ d.title_en or d.title_bn }}</title>
     <link>{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}</link>
