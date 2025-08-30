@@ -1,0 +1,6 @@
+[
+  { "name": "marketplace", "title": "Marketplace" },
+  { "name": "hosting", "title": "Hosting" },
+  { "name": "travel", "title": "Travel" },
+  { "name": "electronics", "title": "Electronics" }
+]
