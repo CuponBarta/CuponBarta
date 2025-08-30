@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "fetch": "node scripts/fetch_deals.js",
     "build": "npx @11ty/eleventy",
     "start": "npx @11ty/eleventy --serve"
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.5"
   }
 }
