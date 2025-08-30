@@ -1,12 +1,11 @@
-name: Build and Deploy Pages
+name: Pages
 
 on:
   workflow_dispatch:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   schedule:
-    # Run daily at 03:05 BD time (21:05 UTC)
-    - cron: '5 21 * * *'
+    - cron: '5 21 * * *' # Daily 03:05 BD time (21:05 UTC)
 
 permissions:
   contents: read
@@ -21,41 +20,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: "Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Cache npm (speed up installs)
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: npm install
 
-      - name: Fetch deals from Google Sheets
+      - name: "Fetch deals from Google Sheets"
         run: node scripts/fetch_deals.js
         continue-on-error: true
 
-      - name: Build Eleventy
+      - name: "Build Eleventy"
         run: npx @11ty/eleventy
 
-      - name: Ensure no Jekyll
+      - name: "Disable Jekyll"
         run: touch _site/.nojekyll
 
-      - name: Debug: list output
-        run: |
-          echo "Root:" && ls -la
-          echo "_site:" && ls -la _site || true
-
-      - name: Upload Pages artifact
+      - name: "Upload artifact"
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -63,10 +49,13 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: "Deploy to GitHub Pages"
         id: deployment
         uses: actions/deploy-pages@v4
