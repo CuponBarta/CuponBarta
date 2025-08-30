@@ -1,0 +1,25 @@
+---
+pagination:
+  data: categories
+  size: 1
+  alias: cat
+permalink: "category/{{ cat.name | slugify }}/index.html"
+layout: layouts/base.njk
+---
+
+<h1>Category: {{ cat.title or cat.name }}</h1>
+
+{% set ids = (categories_map[cat.name] or []) %}
+{% if ids.length == 0 %}
+  <p>No deals yet in this category.</p>
+{% else %}
+  {% for d in collections.activeDeals %}
+    {% if ids.indexOf(d.id) > -1 %}
+      <article class="deal">
+        <h3><a href="{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}">{{ d.title_bn or d.title_en }}</a></h3>
+        <div class="pill">{{ d.merchant }}</div>
+        <p>{{ d.description_bn }}</p>
+      </article>
+    {% endif %}
+  {% endfor %}
+{% endif %}
