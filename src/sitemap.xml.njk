@@ -1,0 +1,27 @@
+---
+permalink: "sitemap.xml"
+eleventyExcludeFromCollections: true
+---
+
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{{ site.baseUrl }}</loc>
+    <changefreq>hourly</changefreq>
+  </url>
+  <url>
+    <loc>{{ ('categories/') | absoluteUrl(site.baseUrl) }}</loc>
+  </url>
+  {% for d in collections.activeDeals %}
+  <url>
+    <loc>{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}</loc>
+    {% if d.verified_at %}<lastmod>{{ d.verified_at | isoDate }}</lastmod>{% endif %}
+  </url>
+  {% endfor %}
+  {% for c in categories %}
+  <url>
+    <loc>{{ ('category/' + (c.name | slugify) + '/') | absoluteUrl(site.baseUrl) }}</loc>
+  </url>
+  {% endfor %}
+</urlset>
+
