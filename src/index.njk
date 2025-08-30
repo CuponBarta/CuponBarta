@@ -7,7 +7,7 @@ description: বাংলাদেশি ক্রেতাদের জন্�
 <h1>নতুন ডিল</h1>
 <p>বাছাইকৃত ভেরিফাইড ডিল ও কুপন। কেবল অফিসিয়াল সোর্স।</p>
 
-{% set items = collections.activeDeals %}
+{% set items = active_deals %}
 {% if items and items.length %}
   {% for d in items | limit(12) %}
     <article class="deal">
@@ -17,7 +17,7 @@ description: বাংলাদেশি ক্রেতাদের জন্�
       {% if d.payment_methods %}<div class="pill">{{ d.payment_methods }}</div>{% endif %}
       <p>{{ d.description_bn }}</p>
       <p>
-        <a class="btn" href="{% if d.affiliate_link and d.affiliate_link != 'TBD' %}{{ d.affiliate_link }}{% else %}{{ d.raw_link }}{% endif %}" rel="nofollow sponsored" target="_blank">ডিল দেখুন</a>
+        <a class="btn" href="{% if d.affiliate_link %}{{ d.affiliate_link }}{% else %}{{ d.raw_link }}{% endif %}" rel="nofollow sponsored" target="_blank">ডিল দেখুন</a>
         <small>Verified: {{ d.verified_at }}</small>
       </p>
     </article>
