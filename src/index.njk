@@ -1,12 +1,27 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{{ site.brand }} — Verified BD Deals & Coupons</title>
-</head>
-<body>
-  <h1>{{ site.brand }}</h1>
-  <p>এই সাইটে আসবে যাচাইকৃত ডিল/কুপন (bKash/Nagad‑friendly). Telegram + RSS digest শিগগিরই।</p>
-</body>
-</html>
+---
+layout: layouts/base.njk
+title: CuponBarta — Verified BD Deals & Coupons
+description: বাংলাদেশি ক্রেতাদের জন্য যাচাইকৃত ডিল/কুপন। bKash/Nagad‑friendly অফার।
+---
+
+<h1>নতুন ডিল</h1>
+<p>বাছাইকৃত ভেরিফাইড ডিল ও কুপন। কেবল অফিসিয়াল সোর্স।</p>
+
+{% set items = collections.activeDeals %}
+{% if items and items.length %}
+  {% for d in items | limit(12) %}
+    <article class="deal">
+      <h3><a href="{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}">{{ d.title_bn or d.title_en }}</a></h3>
+      <div class="pill">{{ d.merchant }}</div>
+      <div class="pill">{{ d.category }}</div>
+      {% if d.payment_methods %}<div class="pill">{{ d.payment_methods }}</div>{% endif %}
+      <p>{{ d.description_bn }}</p>
+      <p>
+        <a class="btn" href="{% if d.affiliate_link and d.affiliate_link != 'TBD' %}{{ d.affiliate_link }}{% else %}{{ d.raw_link }}{% endif %}" rel="nofollow sponsored" target="_blank">ডিল দেখুন</a>
+        <small>Verified: {{ d.verified_at }}</small>
+      </p>
+    </article>
+  {% endfor %}
+{% else %}
+  <p>Deals will appear after data fetch is enabled.</p>
+{% endif %}
