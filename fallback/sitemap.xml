@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>CuponBarta — Deals (Fallback)</title>
+  <link>https://cuponbarta.github.io/CuponBarta/</link>
+  <description>Fallback RSS feed. Replaced by Eleventy when build succeeds.</description>
+  <language>bn-BD</language>
+</channel>
+</rss>
