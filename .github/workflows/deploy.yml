@@ -40,8 +40,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Fetch deals from Google Sheets
+          - name: Fetch deals from Google Sheets
         run: node scripts/fetch_deals.js
+        continue-on-error: true
+
 
       - name: Build Eleventy
         run: npx @11ty/eleventy
