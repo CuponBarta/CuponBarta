@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Fetch deals from Google Sheets (non-blocking)
+      - name: Fetch deals (non-blocking)
         run: node scripts/fetch_deals.js
         continue-on-error: true
 
@@ -33,41 +33,18 @@ jobs:
         run: npx @11ty/eleventy
         continue-on-error: true
 
-      - name: Ensure _site exists and fallback homepage
+      - name: Ensure _site and fallback index
         run: |
           mkdir -p _site
           if [ ! -f "_site/index.html" ] && [ -f "index.html" ]; then
-            cp index.html _site/index.html || true
+            cp index.html _site/index.html
           fi
 
-      - name: Ensure fallback feed.xml and sitemap.xml
+      - name: Copy fallback feed/sitemap if missing
         run: |
           mkdir -p _site
-          if [ ! -f "_site/feed.xml" ]; then
-            cat > _site/feed.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-<channel>
-  <title>CuponBarta — Deals</title>
-  <link>https://cuponbarta.github.io/CuponBarta/</link>
-  <description>Latest verified deals and coupons for Bangladesh (fallback feed).</description>
-  <language>bn-BD</language>
-</channel>
-</rss>
-EOF
-          fi
-          if [ ! -f "_site/sitemap.xml" ]; then
-            cat > _site/sitemap.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://cuponbarta.github.io/CuponBarta/</loc>
-    <changefreq>hourly</changefreq>
-  </url>
-</urlset>
-EOF
-          fi
-          echo "Built files in _site:"
+          if [ ! -f "_site/feed.xml" ] && [ -f "fallback/feed.xml" ]; then cp fallback/feed.xml _site/feed.xml; fi
+          if [ ! -f "_site/sitemap.xml" ] && [ -f "fallback/sitemap.xml" ]; then cp fallback/sitemap.xml _site/sitemap.xml; fi
           ls -la _site || true
 
       - name: Disable Jekyll
@@ -84,11 +61,7 @@ EOF
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
