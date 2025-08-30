@@ -40,20 +40,20 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-          - name: Fetch deals from Google Sheets
+      - name: Fetch deals from Google Sheets
         run: node scripts/fetch_deals.js
         continue-on-error: true
-
 
       - name: Build Eleventy
         run: npx @11ty/eleventy
 
+      - name: Ensure no Jekyll
+        run: touch _site/.nojekyll
+
       - name: Debug: list output
         run: |
-          echo "Root:"
-          ls -la
-          echo "_site:"
-          ls -la _site || true
+          echo "Root:" && ls -la
+          echo "_site:" && ls -la _site || true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
