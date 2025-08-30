@@ -19,7 +19,7 @@ function isoDateOrBlank(v) {
   const s = (v || "").toString().trim();
   if (!s) return "";
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (m) return `${m[1]}-${m[2]}-${m[3]}`; // YYYY-MM-DD only
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
   return "";
 }
 function todayYMD() {
@@ -34,22 +34,14 @@ async function main() {
   const cfgRaw = await fs.readFile(path.join(process.cwd(), "config.json"), "utf8");
   const cfg = JSON.parse(cfgRaw);
   const sheetCsvUrl = cfg.sheetCsvUrl;
-  if (!sheetCsvUrl) {
-    throw new Error("config.json: sheetCsvUrl missing.");
-  }
-  // Accept both published link formats:
-  // - .../pub?gid=...&single=true&output=csv
-  // - .../export?format=csv&gid=...
+  if (!sheetCsvUrl) throw new Error("config.json: sheetCsvUrl missing.");
+
   const isCsv = sheetCsvUrl.includes("output=csv") || sheetCsvUrl.includes("export?format=csv");
-  if (!isCsv) {
-    console.warn("Warning: sheetCsvUrl may not be a CSV link. Attempting fetch anyway...");
-  }
+  if (!isCsv) console.warn("Warning: sheetCsvUrl may not be a CSV link. Attempting fetch anyway...");
 
   console.log("Fetching CSV:", sheetCsvUrl);
   const res = await fetch(sheetCsvUrl);
-  if (!res.ok) {
-    throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
-  }
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
   const csv = await res.text();
 
   const rows = parse(csv, { columns: true, skip_empty_lines: true, bom: true });
@@ -92,11 +84,8 @@ async function main() {
     if (!d.id) return false;
     if (seen.has(d.id)) return false;
     seen.add(d.id);
-
     if (d.status !== "active") return false;
-
     if (d.expiry_date && d.expiry_date < today) return false;
-
     return true;
   });
 
@@ -119,6 +108,7 @@ async function main() {
   await fs.mkdir(dataDir, { recursive: true });
 
   await fs.writeFile(path.join(dataDir, "deals.json"), JSON.stringify(normalized, null, 2) + "\n");
+  await fs.writeFile(path.join(dataDir, "active_deals.json"), JSON.stringify(normalized, null, 2) + "\n");
   await fs.writeFile(path.join(dataDir, "categories.json"), JSON.stringify(categories, null, 2) + "\n");
   await fs.writeFile(path.join(dataDir, "categories_map.json"), JSON.stringify(catMap, null, 2) + "\n");
 
