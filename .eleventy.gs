@@ -17,20 +17,6 @@ module.exports = function(eleventyConfig) {
     const d = str ? new Date(str) : new Date();
     return d.toISOString();
   });
-  eleventyConfig.addCollection("activeDeals", (api) => {
-    const deals = api.globalData.deals || [];
-    const now = new Date();
-    const active = deals.filter(d => {
-      if (d.status && String(d.status).toLowerCase() !== "active") return false;
-      if (d.expiry_date) {
-        const dt = new Date(d.expiry_date);
-        if (!isNaN(dt) && dt < now) return false;
-      }
-      return true;
-    });
-    active.sort((a,b) => (b.verified_at || b.start_date || "").localeCompare(a.verified_at || a.start_date || ""));
-    return active;
-  });
   return {
     dir: { input: "src", includes: "_includes", data: "_data", output: "_site" },
     markdownTemplateEngine: "njk",
