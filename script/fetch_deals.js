@@ -1,5 +1,5 @@
 // scripts/fetch_deals.js
-// Reads Google Sheets CSV and produces Eleventy data JSONs.
+// Reads Google Sheets CSV and produces Eleventy data JSONs for CuponBarta.
 // Ethics/TOS: only public offer data from your Sheet. No private/scraped data.
 
 const fs = require("fs").promises;
@@ -34,13 +34,22 @@ async function main() {
   const cfgRaw = await fs.readFile(path.join(process.cwd(), "config.json"), "utf8");
   const cfg = JSON.parse(cfgRaw);
   const sheetCsvUrl = cfg.sheetCsvUrl;
-  if (!sheetCsvUrl || !sheetCsvUrl.includes("output=csv")) {
-    throw new Error("config.json: sheetCsvUrl missing or not a CSV publish link.");
+  if (!sheetCsvUrl) {
+    throw new Error("config.json: sheetCsvUrl missing.");
+  }
+  // Accept both published link formats:
+  // - .../pub?gid=...&single=true&output=csv
+  // - .../export?format=csv&gid=...
+  const isCsv = sheetCsvUrl.includes("output=csv") || sheetCsvUrl.includes("export?format=csv");
+  if (!isCsv) {
+    console.warn("Warning: sheetCsvUrl may not be a CSV link. Attempting fetch anyway...");
   }
 
   console.log("Fetching CSV:", sheetCsvUrl);
   const res = await fetch(sheetCsvUrl);
-  if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+  if (!res.ok) {
+    throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+  }
   const csv = await res.text();
 
   const rows = parse(csv, { columns: true, skip_empty_lines: true, bom: true });
@@ -77,33 +86,26 @@ async function main() {
       verified_at: isoDateOrBlank(obj.verified_at),
       image: obj.image || ""
     };
-
-    // Normalize affiliate_link "TBD" to blank
     if (n.affiliate_link.toUpperCase() === "TBD") n.affiliate_link = "";
     return n;
   }).filter(d => {
-    // Unique by id
     if (!d.id) return false;
     if (seen.has(d.id)) return false;
     seen.add(d.id);
 
-    // Status must be active
     if (d.status !== "active") return false;
 
-    // Prune expired
     if (d.expiry_date && d.expiry_date < today) return false;
 
     return true;
   });
 
-  // Sort newest first by verified_at or start_date
   normalized.sort((a, b) => {
     const ad = a.verified_at || a.start_date || "";
     const bd = b.verified_at || b.start_date || "";
     return bd.localeCompare(ad);
   });
 
-  // Build categories list and map
   const catSet = new Set();
   const catMap = {};
   for (const d of normalized) {
@@ -113,7 +115,6 @@ async function main() {
   }
   const categories = Array.from(catSet).sort().map(name => ({ name, title: titleize(name) }));
 
-  // Ensure _data directory
   const dataDir = path.join(process.cwd(), "src", "_data");
   await fs.mkdir(dataDir, { recursive: true });
 
