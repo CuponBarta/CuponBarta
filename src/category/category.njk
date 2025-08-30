@@ -13,7 +13,7 @@ layout: layouts/base.njk
 {% if ids.length == 0 %}
   <p>No deals yet in this category.</p>
 {% else %}
-  {% for d in collections.activeDeals %}
+  {% for d in active_deals %}
     {% if ids.indexOf(d.id) > -1 %}
       <article class="deal">
         <h3><a href="{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}">{{ d.title_bn or d.title_en }}</a></h3>
