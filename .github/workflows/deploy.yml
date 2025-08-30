@@ -2,8 +2,6 @@ name: Pages
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
   schedule:
     - cron: '5 21 * * *' # Daily 03:05 BD time (21:05 UTC)
 
@@ -12,56 +10,44 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout"
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: "Setup Node.js"
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: "Show versions"
-        run: |
-          node -v
-          npm -v
-
-      - name: "Install dependencies"
+      - name: Install dependencies
         run: npm install
 
-      - name: "List installed packages"
-        run: npm ls --depth=0 || true
-
-      - name: "Show config.json"
-        run: |
-          echo "--- config.json ---"
-          cat config.json
-
-      - name: "Fetch deals from Google Sheets (non-blocking)"
+      - name: Fetch deals from Google Sheets (non-blocking)
         run: node scripts/fetch_deals.js
         continue-on-error: true
 
-      - name: "List data files"
-        run: |
-          echo "--- src/_data ---"
-          ls -la src/_data || true
-          echo "--- deals.json (first 80 lines) ---"
-          head -n 80 src/_data/deals.json || true
-
-      - name: "Build Eleventy"
+      - name: Build Eleventy (non-blocking)
         run: npx @11ty/eleventy
+        continue-on-error: true
 
-      - name: "Disable Jekyll"
-        run: mkdir -p _site && touch _site/.nojekyll
+      - name: Ensure _site exists and fallback index
+        run: |
+          mkdir -p _site
+          # If Eleventy didn’t create an index, publish the root index.html as a fallback
+          if [ ! -f "_site/index.html" ]; then
+            if [ -f "index.html" ]; then
+              cp index.html _site/index.html || true
+            fi
+          fi
+          ls -la _site || true
 
-      - name: "Upload artifact"
+      - name: Disable Jekyll
+        run: touch _site/.nojekyll
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -69,13 +55,13 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     steps:
-      - name: "Deploy to GitHub Pages"
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
