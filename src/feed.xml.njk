@@ -1,0 +1,23 @@
+---
+permalink: "feed.xml"
+eleventyExcludeFromCollections: true
+---
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>{{ site.brand }} — Deals</title>
+  <link>{{ site.baseUrl }}</link>
+  <description>Latest verified deals and coupons for Bangladesh (bKash/Nagad friendly).</description>
+  <language>bn-BD</language>
+  {% for d in collections.activeDeals | limit(30) %}
+  <item>
+    <title>{{ d.title_en or d.title_bn }}</title>
+    <link>{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}</link>
+    <guid isPermaLink="true">{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}</guid>
+    <pubDate>{{ (d.verified_at or d.start_date) | rfc822 }}</pubDate>
+    <description><![CDATA[ {{ d.description_bn }} ]]></description>
+  </item>
+  {% endfor %}
+</channel>
+</rss>
