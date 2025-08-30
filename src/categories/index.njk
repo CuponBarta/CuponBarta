@@ -9,3 +9,4 @@ title: Categories — CuponBarta
   <li><a href="{{ ('category/' + (c.name | slugify) + '/') | absoluteUrl(site.baseUrl) }}">{{ c.title or c.name }}</a></li>
 {% endfor %}
 </ul>
+
