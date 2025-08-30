@@ -1,0 +1,31 @@
+name: Telegram Post
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 21 * * *'  # Daily 03:10 BD time (21:10 UTC)
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Fetch latest deals (non-blocking)
+        run: node scripts/fetch_deals.js || true
+
+      - name: Post to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/post_telegram.js
+
