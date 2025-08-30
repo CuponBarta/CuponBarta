@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "eleventy",
-    "start": "eleventy --serve"
+    "build": "npx @11ty/eleventy",
+    "start": "npx @11ty/eleventy --serve"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  }
 }
