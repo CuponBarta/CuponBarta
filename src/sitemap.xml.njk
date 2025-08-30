@@ -12,7 +12,7 @@ eleventyExcludeFromCollections: true
   <url>
     <loc>{{ ('categories/') | absoluteUrl(site.baseUrl) }}</loc>
   </url>
-  {% for d in collections.activeDeals %}
+  {% for d in active_deals %}
   <url>
     <loc>{{ ('deal/' + d.id + '/') | absoluteUrl(site.baseUrl) }}</loc>
     {% if d.verified_at %}<lastmod>{{ d.verified_at | isoDate }}</lastmod>{% endif %}
@@ -24,4 +24,3 @@ eleventyExcludeFromCollections: true
   </url>
   {% endfor %}
 </urlset>
-
