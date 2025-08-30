@@ -28,18 +28,38 @@ jobs:
         with:
           node-version: 20
 
+      - name: "Show versions"
+        run: |
+          node -v
+          npm -v
+
       - name: "Install dependencies"
         run: npm install
 
-      - name: "Fetch deals from Google Sheets"
+      - name: "List installed packages"
+        run: npm ls --depth=0 || true
+
+      - name: "Show config.json"
+        run: |
+          echo "--- config.json ---"
+          cat config.json
+
+      - name: "Fetch deals from Google Sheets (non-blocking)"
         run: node scripts/fetch_deals.js
         continue-on-error: true
+
+      - name: "List data files"
+        run: |
+          echo "--- src/_data ---"
+          ls -la src/_data || true
+          echo "--- deals.json (first 80 lines) ---"
+          head -n 80 src/_data/deals.json || true
 
       - name: "Build Eleventy"
         run: npx @11ty/eleventy
 
       - name: "Disable Jekyll"
-        run: touch _site/.nojekyll
+        run: mkdir -p _site && touch _site/.nojekyll
 
       - name: "Upload artifact"
         uses: actions/upload-pages-artifact@v3
