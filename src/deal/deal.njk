@@ -33,7 +33,7 @@ layout: layouts/base.njk
 <p>{{ deal.description_bn }}</p>
 
 <p>
-  <a class="btn" href="{% if deal.affiliate_link and deal.affiliate_link != 'TBD' %}{{ deal.affiliate_link }}{% else %}{{ deal.raw_link }}{% endif %}" rel="nofollow sponsored" target="_blank">ডিল দেখুন</a>
+  <a class="btn" href="{% if deal.affiliate_link %}{{ deal.affiliate_link }}{% else %}{{ deal.raw_link }}{% endif %}" rel="nofollow sponsored" target="_blank">ডিল দেখুন</a>
 </p>
 
 {% if deal.code %}
