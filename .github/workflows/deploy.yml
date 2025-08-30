@@ -2,13 +2,15 @@ name: Pages
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '5 21 * * *' # Daily 03:05 BD time (21:05 UTC)
 
-permissions:A
+permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -26,29 +28,13 @@ jobs:
         run: npm install
 
       - name: Fetch deals (non-blocking)
-        run: node scripts/fetch_deals.js
-        continue-on-error: true
+        run: node scripts/fetch_deals.js || true
 
       - name: Build Eleventy (non-blocking)
-        run: npx @11ty/eleventy
-        continue-on-error: true
+        run: npx @11ty/eleventy || true
 
-      - name: Ensure _site and fallback index
-        run: |
-          mkdir -p _site
-          if [ ! -f "_site/index.html" ] && [ -f "index.html" ]; then
-            cp index.html _site/index.html
-          fi
-
-      - name: Copy fallback feed/sitemap if missing
-        run: |
-          mkdir -p _site
-          if [ ! -f "_site/feed.xml" ] && [ -f "fallback/feed.xml" ]; then cp fallback/feed.xml _site/feed.xml; fi
-          if [ ! -f "_site/sitemap.xml" ] && [ -f "fallback/sitemap.xml" ]; then cp fallback/sitemap.xml _site/sitemap.xml; fi
-          ls -la _site || true
-
-      - name: Disable Jekyll
-        run: touch _site/.nojekyll
+      - name: Ensure _site and .nojekyll
+        run: mkdir -p _site && touch _site/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -62,32 +48,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
-  notify:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Fetch deals latest (non-blocking)
-        run: node scripts/fetch_deals.js
-        continue-on-error: true
-
-      - name: Post top deals to Telegram
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node scripts/post_telegram.js
 
