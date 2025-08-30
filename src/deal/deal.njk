@@ -1,0 +1,49 @@
+---
+pagination:
+  data: deals
+  size: 1
+  alias: deal
+permalink: "deal/{{ deal.id }}/index.html"
+layout: layouts/base.njk
+---
+
+{% set head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Offer",
+  "name": "{{ deal.title_en | default(deal.title_bn) | replace('\"','') }}",
+  "description": "{{ deal.description_bn | replace('\"','') }}",
+  "url": "{{ ('deal/' + deal.id + '/') | absoluteUrl(site.baseUrl) }}",
+  "seller": { "@type": "Organization", "name": "{{ deal.merchant | replace('\"','') }}" },
+  "category": "{{ deal.category }}",
+  "areaServed": "BD",
+  "availability": "https://schema.org/InStock",
+  "validFrom": "{{ deal.start_date }}",
+  "validThrough": "{{ deal.expiry_date }}"
+}
+</script>
+{% endset %}
+
+<h1>{{ deal.title_bn or deal.title_en }}</h1>
+<p class="pill">{{ deal.merchant }}</p>
+<p class="pill">{{ deal.category }}</p>
+{% if deal.payment_methods %}<p class="pill">{{ deal.payment_methods }}</p>{% endif %}
+
+<p>{{ deal.description_bn }}</p>
+
+<p>
+  <a class="btn" href="{% if deal.affiliate_link and deal.affiliate_link != 'TBD' %}{{ deal.affiliate_link }}{% else %}{{ deal.raw_link }}{% endif %}" rel="nofollow sponsored" target="_blank">ডিল দেখুন</a>
+</p>
+
+{% if deal.code %}
+  <p>Coupon code: <strong>{{ deal.code }}</strong></p>
+{% endif %}
+
+<ul>
+  {% if deal.start_date %}<li>Start: {{ deal.start_date }}</li>{% endif %}
+  {% if deal.expiry_date %}<li>Ends: {{ deal.expiry_date }}</li>{% endif %}
+  {% if deal.verified_at %}<li>Verified: {{ deal.verified_at }}</li>{% endif %}
+</ul>
+
+<p><a href="{{ '/' | absoluteUrl(site.baseUrl) }}">← Back to Home</a></p>
