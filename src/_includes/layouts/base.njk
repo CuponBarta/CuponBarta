@@ -30,6 +30,7 @@
         <a href="{{ '/' | absoluteUrl(site.baseUrl) }}">Home</a>
         <a href="{{ 'categories/' | absoluteUrl(site.baseUrl) }}">Categories</a>
         <a href="{{ 'feed.xml' | absoluteUrl(site.baseUrl) }}">RSS</a>
+        {% if site.subscribeUrl %}<a href="{{ site.subscribeUrl }}" rel="nofollow" target="_blank">Subscribe</a>{% endif %}
       </nav>
     </div>
   </header>
@@ -42,4 +43,3 @@
   </footer>
 </body>
 </html>
-
