@@ -1,4 +1,4 @@
-name: Pages
+nname: Pages
 
 on:
   workflow_dispatch:
@@ -7,10 +7,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -33,8 +29,41 @@ jobs:
       - name: Build Eleventy (non-blocking)
         run: npx @11ty/eleventy || true
 
-      - name: Ensure _site and .nojekyll
-        run: mkdir -p _site && touch _site/.nojekyll
+      - name: Ensure _site and fallback files
+        run: |
+          mkdir -p _site
+          # If Eleventy didn't produce index.html, copy root fallback
+          if [ ! -f "_site/index.html" ] && [ -f "index.html" ]; then
+            cp index.html _site/index.html
+          fi
+          # Always ensure feed.xml and sitemap.xml exist (simple fallbacks)
+          if [ ! -f "_site/feed.xml" ]; then
+            cat > _site/feed.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>CuponBarta — Deals (Fallback)</title>
+  <link>https://cuponbarta.github.io/CuponBarta/</link>
+  <description>Fallback RSS feed. Replaced when Eleventy build succeeds.</description>
+  <language>bn-BD</language>
+</channel>
+</rss>
+EOF
+          fi
+          if [ ! -f "_site/sitemap.xml" ]; then
+            cat > _site/sitemap.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://cuponbarta.github.io/CuponBarta/</loc>
+    <changefreq>hourly</changefreq>
+  </url>
+</urlset>
+EOF
+          fi
+          # Jekyll off
+          touch _site/.nojekyll
+          echo "Built files in _site:" && ls -la _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -51,4 +80,3 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
