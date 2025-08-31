@@ -7,8 +7,10 @@
   <meta name="description" content="{% if description %}{{ description }}{% else %}Bangladesh-focused verified deals & coupons. bKash/Nagad-friendly offers.{% endif %}">
   <link rel="canonical" href="{{ page.url | absoluteUrl(site.baseUrl) }}">
 
-  <!-- Google Search Console verification (exact token you shared) -->
+  <!-- Google Search Console verification -->
   <meta name="google-site-verification" content="g-IIsx-e-4y-WD41yN2Tap5SlHx_O69dc0kqjMusU0g" />
+  <!-- Bing Webmaster Tools verification -->
+  <meta name="msvalidate.01" content="5049CF3D7A952DE4DC7017DEDB071554" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="{% if title %}{{ title }}{% else %}{{ site.brand }} — BD Deals & Coupons{% endif %}">
@@ -37,7 +39,7 @@
   </style>
   {% if head_extra %}{{ head_extra | safe }}{% endif %}
 
-  <!-- Cloudflare Analytics (keep your real token if already set) -->
+  <!-- Cloudflare Analytics -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"fbb0c28b7266414b95be118e128746e1","spa":false}'></script>
 </head>
 <body>
@@ -61,4 +63,3 @@
   </footer>
 </body>
 </html>
-
