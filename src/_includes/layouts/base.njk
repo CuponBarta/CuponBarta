@@ -6,6 +6,22 @@
   <title>{% if title %}{{ title }}{% else %}{{ site.brand }} — BD Deals & Coupons{% endif %}</title>
   <meta name="description" content="{% if description %}{{ description }}{% else %}Bangladesh-focused verified deals & coupons. bKash/Nagad-friendly offers.{% endif %}">
   <link rel="canonical" href="{{ page.url | absoluteUrl(site.baseUrl) }}">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="{% if title %}{{ title }}{% else %}{{ site.brand }} — BD Deals & Coupons{% endif %}">
+  <meta property="og:description" content="{% if description %}{{ description }}{% else %}Bangladesh-focused verified deals & coupons. bKash/Nagad-friendly offers.{% endif %}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ page.url | absoluteUrl(site.baseUrl) }}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if title %}{{ title }}{% else %}{{ site.brand }} — BD Deals & Coupons{% endif %}">
+  <meta name="twitter:description" content="{% if description %}{{ description }}{% else %}Bangladesh-focused verified deals & coupons. bKash/Nagad-friendly offers.{% endif %}">
+
+  <!-- Search Console (paste tokens in content="" when you have them) -->
+  <meta name="google-site-verification" content="GOOGLE_VERIFY_TOKEN">
+  <meta name="msvalidate.01" content="BING_VERIFY_TOKEN">
+
   <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ 'feed.xml' | absoluteUrl(site.baseUrl) }}">
   <style>
     :root{--bg:#ffffff;--txt:#111827;--sub:#6b7280;--brand:#16a34a;--chip:#f3f4f6;--border:#e5e7eb}
@@ -21,6 +37,19 @@
     .btn{display:inline-block;background:var(--brand);color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none}
   </style>
   {% if head_extra %}{{ head_extra | safe }}{% endif %}
+
+  <!-- Organization JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"{{ site.brand }}",
+    "url":"{{ site.baseUrl }}"
+  }
+  </script>
+
+  <!-- Cloudflare Analytics -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"YOUR_CF_TOKEN","spa":false}'></script>
 </head>
 <body>
   <header>
