@@ -27,11 +27,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: List repo tree (src, data, includes)
+        run: |
+          echo "== src ==" && ls -la src || true
+          echo "== src/_includes ==" && ls -la src/_includes || true
+          echo "== src/_includes/layouts ==" && ls -la src/_includes/layouts || true
+          echo "== src/_data ==" && ls -la src/_data || true
+          echo "== show index.njk head ==" && head -n 30 src/index.njk || true
+
       - name: Fetch deals (non-blocking)
         run: node scripts/fetch_deals.js || true
 
-      - name: Build Eleventy (non-blocking)
-        run: npx @11ty/eleventy || true
+      - name: Build Eleventy (record exit code)
+        run: |
+          set +e
+          npx @11ty/eleventy
+          CODE=$?
+          echo "ELEVENTY_EXIT=$CODE" >> $GITHUB_ENV
+          set -e
 
       - name: Ensure _site and fallbacks
         run: |
@@ -40,7 +53,7 @@ jobs:
           if [ ! -f "_site/feed.xml" ]; then echo '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>CuponBarta — Fallback Feed</title><link>https://cuponbarta.github.io/CuponBarta/</link><description>Fallback</description><language>bn-BD</language></channel></rss>' > _site/feed.xml; fi
           if [ ! -f "_site/sitemap.xml" ]; then echo '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://cuponbarta.github.io/CuponBarta/</loc><changefreq>hourly</changefreq></url></urlset>' > _site/sitemap.xml; fi
           touch _site/.nojekyll
-          ls -la _site
+          echo "== _site listing ==" && ls -la _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
