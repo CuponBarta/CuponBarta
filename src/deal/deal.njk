@@ -46,5 +46,19 @@ layout: layouts/base.njk
   {% if deal.verified_at %}<li>Verified: {{ deal.verified_at }}</li>{% endif %}
 </ul>
 
-<p><a href="{{ '/' | absoluteUrl(site.baseUrl) }}">← Back to Home</a></p>
+<hr>
+<h2>আরো একই ক্যাটেগরির ডিল</h2>
+<ul>
+{% set shown = 0 %}
+{% for r in active_deals %}
+  {% if r.category == deal.category and r.id != deal.id and shown < 4 %}
+    <li><a href="{{ ('deal/' + r.id + '/') | absoluteUrl(site.baseUrl) }}">{{ r.title_bn or r.title_en }}</a></li>
+    {% set shown = shown + 1 %}
+  {% endif %}
+{% endfor %}
+{% if shown == 0 %}
+  <li>More deals will appear soon.</li>
+{% endif %}
+</ul>
 
+<p><a href="{{ '/' | absoluteUrl(site.baseUrl) }}">← Back to Home</a></p>
